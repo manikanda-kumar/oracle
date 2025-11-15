@@ -58,6 +58,10 @@ export async function attachSession(sessionId: string): Promise<void> {
     return;
   }
   console.log(chalk.bold(`Session: ${sessionId}`));
+  const reattachLine = buildReattachLine(metadata);
+  if (reattachLine) {
+    console.log(chalk.blue(reattachLine));
+  }
   console.log(`Created: ${metadata.createdAt}`);
   console.log(`Status: ${metadata.status}`);
   console.log(`Model: ${metadata.model}`);
