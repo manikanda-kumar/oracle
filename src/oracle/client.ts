@@ -18,7 +18,8 @@ export function createDefaultClientFactory(): (apiKey: string) => ClientLike {
       responses: {
         stream: (body: OracleRequestBody) =>
           instance.responses.stream(body) as unknown as Promise<ResponseStreamLike>,
-        create: (body: OracleRequestBody) => instance.responses.create(body) as unknown as Promise<OracleResponse>,
+        create: (body: OracleRequestBody) =>
+          instance.responses.create(body) as unknown as Promise<OracleResponse>,
         retrieve: (id: string) => instance.responses.retrieve(id) as unknown as Promise<OracleResponse>,
       },
     };
