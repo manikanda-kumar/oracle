@@ -689,13 +689,11 @@ async function runRootCommand(options: CliOptions): Promise<void> {
       userConfig,
       true,
     );
-    console.log(chalk.bold(`Session ${sessionMeta.id} completed`));
     return;
   }
   if (detached) {
     console.log(chalk.blue(`Reattach via: oracle session ${sessionMeta.id}`));
     await attachSession(sessionMeta.id, { suppressMetadata: true });
-    console.log(chalk.bold(`Session ${sessionMeta.id} completed`));
   }
 }
 
