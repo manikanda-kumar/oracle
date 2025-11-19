@@ -257,10 +257,12 @@ function formatTimestampAligned(iso: string): string {
     second: undefined,
     hour12: true,
   };
-  const formatted = date.toLocaleString(locale, opts);
+  let formatted = date.toLocaleString(locale, opts);
+  // Drop the comma and use double-space between date and time for alignment.
+  formatted = formatted.replace(', ', '  ');
   // Insert a leading space when hour is a single digit to align AM/PM column.
-  // Example: "11/18/2025, 1:07:05 AM" -> "11/18/2025,  1:07:05 AM"
-  return formatted.replace(/(, )(\d:)/, '$1 $2');
+  // Example: "11/18/2025  1:07 AM" -> "11/18/2025   1:07 AM"
+  return formatted.replace(/(\s)(\d:)/, '$1 $2');
 }
 
 function colorStatus(status: string): string {
