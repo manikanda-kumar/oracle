@@ -263,21 +263,14 @@ function formatReachableAddresses(bindAddress: string, port: number): string[] {
     const interfaces = os.networkInterfaces();
     for (const entries of Object.values(interfaces)) {
       if (!entries) continue;
-      const list = entries as Array<{ family: string | number; address: string; internal?: boolean }>;
-      for (const entry of list) {
-        if (!entry || entry.internal) continue;
-        const family =
-          typeof entry.family === 'string'
-            ? entry.family
-            : entry.family === 4
-              ? 'IPv4'
-              : entry.family === 6
-                ? 'IPv6'
-                : '';
+      for (const entry of entries) {
+        const iface = entry as { family?: string | number; address: string; internal?: boolean } | undefined;
+        if (!iface || iface.internal) continue;
+        const family = typeof iface.family === 'string' ? iface.family : '';
         if (family === 'IPv4') {
-          addresses.push(`${entry.address}:${port}`);
+          addresses.push(`${iface.address}:${port}`);
         } else if (family === 'IPv6') {
-          addresses.push(`[${entry.address}]:${port}`);
+          addresses.push(`[${iface.address}]:${port}`);
         }
       }
     }
