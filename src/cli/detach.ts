@@ -15,7 +15,7 @@ export function shouldDetachSession({
   disableDetachEnv: boolean;
 }): boolean {
   if (disableDetachEnv) return false;
-  // Only Pro-tier API runs should start detached by default; everything else stays inline for clarity.
-  if (PRO_MODELS.has(model as Parameters<typeof PRO_MODELS.has>[0])) return true;
+  // Only Pro-tier API runs should start detached by default; browser runs stay inline so failures surface.
+  if (PRO_MODELS.has(model as Parameters<typeof PRO_MODELS.has>[0]) && _engine === 'api') return true;
   return false;
 }
