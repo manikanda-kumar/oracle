@@ -449,7 +449,12 @@ export async function runOracle(options: RunOracleOptions, deps: RunOracleDeps =
   const statsParts: string[] = [];
   const effortLabel = modelConfig.reasoning?.effort;
   const modelLabel = effortLabel ? `${modelConfig.model}[${effortLabel}]` : modelConfig.model;
-  statsParts.push(modelLabel);
+  const sessionIdContainsModel =
+    typeof options.sessionId === 'string' && options.sessionId.toLowerCase().includes(modelConfig.model.toLowerCase());
+  // Avoid duplicating the model name in the prefix (session id) and the stats bundle; keep a single source of truth.
+  if (!sessionIdContainsModel) {
+    statsParts.push(modelLabel);
+  }
   if (cost != null) {
     statsParts.push(formatUSD(cost));
   } else {
