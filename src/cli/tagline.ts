@@ -293,7 +293,7 @@ export function formatIntroLine(version: string, options: TaglineOptions = {}): 
   const tagline = pickTagline(options);
   const rich = options.richTty ?? true;
   if (rich && chalk.level > 0) {
-    return `${chalk.bold('🧿 oracle')} ${version} ${chalk.dim(`— ${tagline}`)}`;
+    return `${chalk.bold('🧿 oracle')} ${version} — ${tagline}`;
   }
   return `🧿 oracle ${version} — ${tagline}`;
 }
