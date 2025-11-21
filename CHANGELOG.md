@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 - Markdown bundles render better in the CLI and ChatGPT: each attached file now appears as `### File: <path>` followed by a fenced code block (language inferred from the extension, fences auto-lengthen when the file already contains backticks). Works for API bundles, browser bundles (including inline mode), and render/dry-run output; ANSI highlighting still applies on rich TTYs.
 - `--render-plain` flag forces plain markdown output (no ANSI/highlighting) even in a rich TTY; takes precedence when combined with `--render` / `--render-markdown`.
 - `--write-output <path>` saves just the final assistant message to disk (adds `.<model>` per file for multi-model runs), with safe path guards and non-fatal write failures.
+- Browser engine now supports Windows via Edge/Chromium when paired with `--browser-chrome-path` and `--browser-cookie-path`, matching macOS capabilities.
+- Remote browser service: `oracle serve` exposes remote host/token defaults in config and keeps the host-only cookie flow documented for cross-machine runs.
 - Remote Chrome automation: pass `--remote-chrome <host:port>` (IPv6 supported via `[host]:port`) to reuse an existing browser session on another machine, including remote attachment uploads and improved validation errors.
 - Browser engine can now target Chromium/Edge by pairing `--browser-chrome-path` with the new `--browser-cookie-path` (also configurable via `browser.chromePath` / `browser.chromeCookiePath`). See the new [docs/chromium-forks.md](docs/chromium-forks.md) for OS-specific paths and setup steps.
 - Remote browser service: `oracle serve` now launches Chrome plus an HTTP/SSE host, and `--remote-host` / `--remote-token` let another machine run browser sessions end-to-end. The service no longer accepts inline cookies; it requires the host Chrome profile to be signed in, opens chatgpt.com if not, and exits so you can log in and restart.
@@ -28,10 +30,16 @@ All notable changes to this project will be documented in this file.
 - Duration flags such as `--browser-timeout`/`--browser-input-timeout` now accept chained units (`1h2m10s`, `3m10s`, etc.) plus `h`, `m`, `s`, or `ms` suffixes, matching the formats we already log.
 - GPT-5.1 Pro and GPT-5 Pro API runs now default to a 60-minute timeout (was 20m) and the “zombie” detector waits the same hour before marking sessions as `error`; CLI messaging/docs updated accordingly so a single “auto” limit covers both behaviors.
 - Browser-to-API coercion now happens automatically for GPT-5.1 Codex and Gemini (with a console hint) instead of failing when `--engine browser` is set.
+- Multi-model output is easier to scan: aggregate header/summary, deduped per-model headings, and on-demand OSC progress when replaying combined logs.
+- `--write-output` adds stricter path safety, rejecting unsafe destinations while keeping writes non-fatal to avoid breaking runs.
 - Gemini client now uses Google’s `@google/genai` SDK (replacing the deprecated `@google/generative-ai`) while preserving streaming final responses and token accounting.
 - Session slugs now trim individual words to 10 characters to keep auto-generated IDs readable when prompts include very long tokens.
 - CLI: `--mode` is now a silent alias for `--engine` for backward compatibility with older docs/scripts; prefer `--engine`.
 - CLI guardrail: if a session with the same prompt is already running, new runs abort with guidance to reattach unless `--force` is provided (prevents unintended duplicate API/browser runs).
+
+### Fixed
+- macOS notifier quarantine repair now ignores missing `xattr` and surfaces only actionable errors, stabilizing desktop notifications.
+- Browser assistant capture is more resilient: markdown cleanup no longer drops real answers and prompt-echo recovery keeps the assistant text intact.
 
 ## 1.3.0 — 2025-11-19
 

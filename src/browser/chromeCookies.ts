@@ -6,7 +6,6 @@ import chromeCookies from 'chrome-cookies-secure';
 import { COOKIE_URLS } from './constants.js';
 import type { CookieParam } from './types.js';
 import './keytarShim.js';
-import { loadWindowsCookies, materializeCookieFile } from './windowsCookies.js';
 
 type KeychainLabel = { service: string; account: string };
 type KeytarLike = { getPassword: (service: string, account: string) => Promise<string | null> };
@@ -32,31 +31,6 @@ export async function loadChromeCookies({
   const merged = new Map<string, CookieParam>();
   const cookieFile = await resolveCookieFilePath({ explicitPath: explicitCookiePath, profile });
   const cookiesPath = await materializeCookieFile(cookieFile);
-  if (process.env.ORACLE_DEBUG_COOKIES === '1') {
-    // Debug helper: surface which cookie DB path we attempt to read.
-    // eslint-disable-next-line no-console
-    console.log(`[cookies] resolved cookie path: ${cookiesPath}`);
-  }
-
-  // Windows: chrome-cookies-secure sometimes returns empty values for modern AES-GCM cookies.
-  // Try native decrypt first; fall back to the cross-platform helper if it fails.
-  if (process.platform === 'win32') {
-    try {
-      const winCookies = await loadWindowsCookies(cookiesPath, filterNames);
-      if (winCookies.length) {
-        for (const cookie of winCookies) {
-          const key = `${cookie.domain}:${cookie.name}`;
-          merged.set(key, cookie);
-        }
-        return Array.from(merged.values());
-      }
-    } catch (error) {
-      if (process.env.ORACLE_DEBUG_COOKIES === '1') {
-        // eslint-disable-next-line no-console
-        console.log(`[cookies] windows decrypt failed: ${error instanceof Error ? error.message : String(error)}`);
-      }
-    }
-  }
 
   await ensureMacKeychainReadable();
 
@@ -245,6 +219,22 @@ function looksLikePath(value: string): boolean {
   return value.includes('/') || value.includes('\\');
 }
 
+async function materializeCookieFile(sourcePath: string): Promise<string> {
+  if (process.platform !== 'win32') return sourcePath;
+  // Chrome can keep the Cookies DB locked; copy to a temp file so sqlite can open it reliably.
+  const tempPath = path.join(
+    os.tmpdir(),
+    `oracle-cookies-${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}.sqlite`,
+  );
+  try {
+    await fs.copyFile(sourcePath, tempPath);
+    return tempPath;
+  } catch (_error) {
+    // Fall back to the original path if the copy fails; upstream error handling will surface issues.
+    return sourcePath;
+  }
+}
+
 async function defaultProfileRoot(): Promise<string> {
   const candidates: string[] = [];
   if (process.platform === 'darwin') {
@@ -258,9 +248,6 @@ async function defaultProfileRoot(): Promise<string> {
       path.join(os.homedir(), '.config', 'google-chrome'),
       path.join(os.homedir(), '.config', 'microsoft-edge'),
       path.join(os.homedir(), '.config', 'chromium'),
-      // Snap-installed Chromium stores profiles under ~/snap/chromium/common/chromium (and variants)
-      path.join(os.homedir(), 'snap', 'chromium', 'common', 'chromium'),
-      path.join(os.homedir(), 'snap', 'chromium', 'current', 'chromium'),
     );
   } else if (process.platform === 'win32') {
     const localAppData = process.env.LOCALAPPDATA ?? path.join(os.homedir(), 'AppData', 'Local');
