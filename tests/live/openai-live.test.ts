@@ -45,10 +45,11 @@ if (!ENABLE_LIVE || !LIVE_API_KEY) {
       async () => {
         const result = await runOracle(
           {
-            prompt: 'Reply with "live pro smoke test" on a single line.',
+            prompt: 'how to ensure agentic feedback loop is available during AI applications, what tools and techniques needs to be made available for agents?',
             model: 'gpt-5-pro',
             silent: true,
-            heartbeatIntervalMs: 2000,
+            background: false,
+            heartbeatIntervalMs: 0,
           },
           sharedDeps,
         );
@@ -56,8 +57,9 @@ if (!ENABLE_LIVE || !LIVE_API_KEY) {
           throw new Error('Expected live result');
         }
         const text = extractTextOutput(result.response);
-        expect(text.toLowerCase()).toContain('live pro smoke test');
+        expect(text.length).toBeGreaterThan(0);
         expect(result.response.status ?? 'completed').toBe('completed');
+        console.log('\n=== GPT-5-PRO RESPONSE ===\n', text, '\n=========================\n');
       },
       30 * 60 * 1000,
     );

@@ -1,8 +1,12 @@
-export const CHATGPT_URL = 'https://chatgpt.com/';
-export const DEFAULT_MODEL_TARGET = 'ChatGPT 5.1';
-export const COOKIE_URLS = ['https://chatgpt.com', 'https://chat.openai.com', 'https://atlas.openai.com'];
+export const CHATGPT_URL = process.env.ORACLE_BROWSER_URL ?? 'https://chatgpt.com/';
+export const DEFAULT_MODEL_TARGET = process.env.ORACLE_BROWSER_MODEL ?? 'ChatGPT 5.1';
+export const COOKIE_URLS = process.env.ORACLE_BROWSER_URL
+  ? [process.env.ORACLE_BROWSER_URL]
+  : ['https://chatgpt.com', 'https://chat.openai.com', 'https://atlas.openai.com'];
 
+const CUSTOM_INPUT = process.env.ORACLE_BROWSER_INPUT_SELECTOR;
 export const INPUT_SELECTORS = [
+  ...(CUSTOM_INPUT ? [CUSTOM_INPUT] : []),
   'textarea[data-id="prompt-textarea"]',
   'textarea[placeholder*="Send a message"]',
   'textarea[aria-label="Message ChatGPT"]',
@@ -13,7 +17,9 @@ export const INPUT_SELECTORS = [
   '[contenteditable="true"][data-virtualkeyboard="true"]',
 ];
 
+const CUSTOM_ANSWER = process.env.ORACLE_BROWSER_ANSWER_SELECTOR;
 export const ANSWER_SELECTORS = [
+  ...(CUSTOM_ANSWER ? [CUSTOM_ANSWER] : []),
   'article[data-testid^="conversation-turn"][data-message-author-role="assistant"]',
   'article[data-testid^="conversation-turn"] [data-message-author-role="assistant"]',
   'article[data-testid^="conversation-turn"] .markdown',
@@ -25,7 +31,7 @@ export const CONVERSATION_TURN_SELECTOR = 'article[data-testid^="conversation-tu
 export const ASSISTANT_ROLE_SELECTOR = '[data-message-author-role="assistant"]';
 export const CLOUDFLARE_SCRIPT_SELECTOR = 'script[src*="/challenge-platform/"]';
 export const CLOUDFLARE_TITLE = 'just a moment';
-export const PROMPT_PRIMARY_SELECTOR = '#prompt-textarea';
+export const PROMPT_PRIMARY_SELECTOR = CUSTOM_INPUT ?? '#prompt-textarea';
 export const PROMPT_FALLBACK_SELECTOR = 'textarea[name="prompt-textarea"]';
 export const FILE_INPUT_SELECTOR = 'form input[type="file"]:not([accept])';
 export const GENERIC_FILE_INPUT_SELECTOR = 'input[type="file"]:not([accept])';
@@ -38,8 +44,8 @@ export const UPLOAD_STATUS_SELECTORS = [
   '[aria-live="polite"]',
 ];
 
-export const STOP_BUTTON_SELECTOR = '[data-testid="stop-button"]';
-export const SEND_BUTTON_SELECTOR = '[data-testid="send-button"]';
+export const STOP_BUTTON_SELECTOR = process.env.ORACLE_BROWSER_STOP_BUTTON_SELECTOR ?? '[data-testid="stop-button"]';
+export const SEND_BUTTON_SELECTOR = process.env.ORACLE_BROWSER_SEND_BUTTON_SELECTOR ?? '[data-testid="send-button"]';
 export const MODEL_BUTTON_SELECTOR = '[data-testid="model-switcher-dropdown-button"]';
 export const COPY_BUTTON_SELECTOR = 'button[data-testid="copy-turn-action-button"]';
 // Action buttons that only appear once a turn has finished rendering.
