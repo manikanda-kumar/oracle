@@ -4,15 +4,20 @@ All notable changes to this project will be documented in this file.
 
 ## 0.4.6 — unreleased
 
+### Changed
+- Default system prompt no longer asks models to announce when the search tool was used.
+
 ### Fixed
 - CLI/TUI now print the intro banner only once; forced TUI launches (`ORACLE_FORCE_TUI` or no args in a TTY) no longer show duplicate 🧿 header lines.
 - TUI session list cleans up separators, removing the `__disabled__ (Disabled)` placeholder and `(Disabled)` tag on the header row.
 
 ### Added
 - `--browser-manual-login` skips cookie copy, reuses a persistent automation profile (`~/.oracle/browser-profile` by default), and waits for manual ChatGPT login—handy on Windows where app-bound cookies can’t be decrypted; works as an opt-in on macOS/Linux too.
+- Manual-login browser sessions can reuse an already-running automation Chrome when remote debugging is enabled; point Oracle at it via `--remote-chrome <host:port>` to avoid relaunching/locks.
 
 ### Changed
 - Windows cookie reader now accepts any `v**` AES-GCM prefix (v10/v11/v20) to stay forward compatible.
+- On Windows, cookie sync is disabled by default and manual-login is forced; use inline cookies or `--browser-manual-login` (default) instead of profile-based cookie copy.
 
 ## 0.4.5 — 2025-11-22
 
@@ -126,7 +131,7 @@ All notable changes to this project will be documented in this file.
 - macOS notifier helper now ships signed/notarized with the Oracle icon and auto-repairs execute bits for the fallback terminal-notifier.
 - Session summaries and cost displays are clearer, with zombie-session detection to avoid stale runs.
 - Token estimation now uses the full request body (instructions + input text + tools/reasoning/background/store) and compares estimated vs actual tokens in the finished stats to reduce 400/413 surprises.
-- Help tips now explicitly warn that Oracle cannot see your project unless you pass `--file …` to attach the necessary source.
+- Help banner and first tip now require “prompt + --file” (dirs/globs fine) and remind you Oracle can’t see your project without attachments.
 - Help tips/examples now call out project/platform/version requirements and show how to label cross-repo attachments so the model has the right context.
 
 #### MCP configuration (quick reference)
